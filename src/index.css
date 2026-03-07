@@ -1,0 +1,30 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;700&family=Inter:wght@400;500;600&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-serif: "Noto Serif KR", serif;
+  
+  --color-warm-50: #fdfcfb;
+  --color-warm-100: #f7f3f0;
+  --color-warm-200: #eee4dc;
+  --color-warm-300: #e0ccbe;
+  --color-warm-400: #c9a68f;
+  --color-warm-500: #b38263;
+  --color-warm-600: #a16b4d;
+  --color-warm-700: #86563f;
+  --color-warm-800: #6d4735;
+  --color-warm-900: #5b3c2e;
+}
+
+body {
+  @apply bg-warm-50 text-warm-900 font-sans;
+}
+
+h1, h2, h3, h4, .serif {
+  @apply font-serif;
+}
+
+.glass {
+  @apply bg-white/70 backdrop-blur-md border border-white/20;
+}
