@@ -307,7 +307,10 @@ const Resources = () => {
   const categories = ['설교 자료', '찬양 자료', '선교 자료', '교육 자료', '교회 행정 자료'];
 
   useEffect(() => {
-    fetch('/api/resources').then(res => res.json()).then(setResources);
+    fetch('/api/resources')
+      .then(res => res.ok ? res.json() : [])
+      .then(data => setResources(Array.isArray(data) ? data : []))
+      .catch(() => setResources([]));
   }, []);
 
   return (
@@ -325,7 +328,7 @@ const Resources = () => {
           </div>
           <div className="lg:col-span-3">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {resources.length === 0 ? (
+              {!Array.isArray(resources) || resources.length === 0 ? (
                 <div className="col-span-full text-center py-20 text-warm-400">
                   등록된 자료가 없습니다.
                 </div>
@@ -545,14 +548,18 @@ const Admin = () => {
   const [schForm, setSchForm] = useState({ title: '', type: 'official', date: '', description: '' });
 
   const fetchData = async () => {
-    const [i, r, s] = await Promise.all([
-      fetch('/api/inquiries').then(res => res.json()),
-      fetch('/api/resources').then(res => res.json()),
-      fetch('/api/schedules').then(res => res.json())
-    ]);
-    setInquiries(i);
-    setResources(r);
-    setSchedules(s);
+    try {
+      const [i, r, s] = await Promise.all([
+        fetch('/api/inquiries').then(res => res.ok ? res.json() : []),
+        fetch('/api/resources').then(res => res.ok ? res.json() : []),
+        fetch('/api/schedules').then(res => res.ok ? res.json() : [])
+      ]);
+      setInquiries(Array.isArray(i) ? i : []);
+      setResources(Array.isArray(r) ? r : []);
+      setSchedules(Array.isArray(s) ? s : []);
+    } catch (error) {
+      console.error("Failed to fetch data:", error);
+    }
   };
 
   useEffect(() => { fetchData(); }, []);
@@ -623,7 +630,7 @@ const Admin = () => {
 
         {tab === 'inquiries' && (
           <div className="space-y-4">
-            {inquiries.map(i => (
+            {Array.isArray(inquiries) && inquiries.map(i => (
               <div key={i.id} className="bg-white p-6 rounded-xl shadow-sm border border-warm-100 flex justify-between items-start">
                 <div>
                   <div className="flex items-center space-x-4 mb-2">
@@ -683,7 +690,7 @@ const Admin = () => {
               </div>
             </div>
             <div className="lg:col-span-2 space-y-4">
-              {resources.map(r => (
+              {Array.isArray(resources) && resources.map(r => (
                 <div key={r.id} className="bg-white p-4 rounded-xl shadow-sm border border-warm-100 flex justify-between items-center">
                   <div>
                     <span className="text-xs font-bold text-warm-500">{r.category}</span>
@@ -792,7 +799,7 @@ const Calendar = ({ schedules, onDelete }: { schedules: any[], onDelete: (id: nu
               <>
                 <div className="text-xs font-bold text-warm-400 mb-1">{d.day}</div>
                 <div className="space-y-1">
-                  {schedules.filter(s => s.date === d.dateStr).map(s => (
+                  {Array.isArray(schedules) && schedules.filter(s => s.date === d.dateStr).map(s => (
                     <div 
                       key={s.id} 
                       className={`text-[10px] p-1 rounded truncate flex justify-between items-center ${
